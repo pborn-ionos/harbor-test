@@ -14,6 +14,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Set up Cosign
+      uses: sigstore/cosign-installer@v2.8.1
+
     - uses: actions/checkout@v3
 
     - name: Set image tag
@@ -39,3 +42,10 @@ jobs:
         registry: ${{ secrets.REGISTRY_HOST }}/pborntest
         username: ${{ secrets.REGISTRY_USER }}
         password: ${{ secrets.REGISTRY_PASS }}
+
+    - name: Signing Images
+      run: |
+        cosign sign --key env://COSIGN_PRIVATE_KEY ${{ secrets.REGISTRY_HOST }}/pborntest/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+      env:
+        COSIGN_PRIVATE_KEY: ${{secrets.COSIGN_PRIVATE_KEY}}
+        COSIGN_PASSWORD: ${{secrets.COSIGN_KEY_PASSWORD}}
