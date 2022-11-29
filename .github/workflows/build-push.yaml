@@ -17,6 +17,12 @@ jobs:
     - name: Set up Cosign
       uses: sigstore/cosign-installer@v2.8.1
 
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
     - uses: actions/checkout@v3
 
     - name: Set image tag
@@ -24,24 +30,18 @@ jobs:
         IMAGE_TAG=${GITHUB_REF_NAME}-${GITHUB_RUN_NUMBER}-${GITHUB_SHA::8}
         echo "IMAGE_TAG=$IMAGE_TAG" >>$GITHUB_ENV
 
-    - name: Build image
-      id: build-image
-      uses: redhat-actions/buildah-build@v2
+    - name: Login to Registry
+      uses: docker/login-action@v2
       with:
-        image: ${{ env.IMAGE_NAME }}
-        tags: ${{ env.IMAGE_TAG }}
-        containerfiles: |
-          ./Dockerfile
-
-    - name: Push to registry
-      id: push-image
-      uses: redhat-actions/push-to-registry@v2
-      with:
-        image: ${{ steps.build-image.outputs.image }}
-        tags: ${{ steps.build-image.outputs.tags }}
-        registry: ${{ secrets.REGISTRY_HOST }}/pborntest
+        registry: ${{ secrets.REGISTRY_HOST }}
         username: ${{ secrets.REGISTRY_USER }}
         password: ${{ secrets.REGISTRY_PASS }}
+    
+    - name: Build and push
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        tags: ${{ secrets.REGISTRY_HOST }}/pborntest/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
     - name: Signing Images
       run: |
