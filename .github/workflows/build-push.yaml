@@ -14,9 +14,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Set up Cosign
-      uses: sigstore/cosign-installer@v2.8.1
-
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
 
@@ -43,9 +40,11 @@ jobs:
         push: true
         tags: ${{ secrets.REGISTRY_HOST }}/pborntest/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
-    - name: Signing Images
-      run: |
-        cosign sign --key env://COSIGN_PRIVATE_KEY ${{ secrets.REGISTRY_HOST }}/pborntest/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+    - name: Sign image
+      uses: tamcore/cosign@master
       env:
         COSIGN_PRIVATE_KEY: ${{secrets.COSIGN_PRIVATE_KEY}}
         COSIGN_PASSWORD: ${{secrets.COSIGN_KEY_PASSWORD}}
+      with:
+        tags: |
+          ${{ secrets.REGISTRY_HOST }}/pborntest/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
