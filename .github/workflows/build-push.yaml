@@ -63,5 +63,6 @@ jobs:
       uses: tamcore/cosign-action@master
       with:
         cosign-keyless: true
+        cosign-flags: "-r"
         tags: |
           ${{ steps.meta.outputs.tags }}
