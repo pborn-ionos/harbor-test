@@ -45,7 +45,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v4
       with:
-        images: ${{ secrets.REGISTRY_HOST }}/pborntest/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+        images: ${{ secrets.REGISTRY_HOST }}/pborntest/${{ env.IMAGE_NAME }}
         tags: |
           type=raw,value=${{ env.IMAGE_TAG }}
 
