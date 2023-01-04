@@ -59,10 +59,12 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-    - name: Sign image without key
+    - name: Sign image
       uses: tamcore/cosign-action@master
+      env:
+        COSIGN_PRIVATE_KEY: ${{secrets.COSIGN_PRIVATE_KEY}}
+        COSIGN_PASSWORD: ${{secrets.COSIGN_KEY_PASSWORD}}
       with:
-        cosign-keyless: true
         cosign-flags: "-r"
         tags: |
           ${{ steps.meta.outputs.tags }}
